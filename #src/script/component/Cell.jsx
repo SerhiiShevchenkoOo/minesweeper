@@ -6,6 +6,7 @@ const Cell = ({
 	cell,
 	index,
 	update,
+<<<<<<< HEAD
 	arr,
 	newGame,
 	setMine,
@@ -16,6 +17,40 @@ const Cell = ({
 	useEffect(() => {
 		setOpen(cell.open);
 	}, [update]);
+=======
+	checkArr,
+	arr,
+	newGame,
+	setMine,
+	gameOver,
+	cut,
+}) => {
+	// open cell if next cell open
+	useEffect(() => {}, [cut]);
+	useEffect(() => {
+		gameOver && setOpen(true);
+
+		checkArr.map(i => {
+			if (arr[i].open && arr[i].mineIndex === 0 && !arr[i].mine) {
+				if (
+					((cell.top && index - cut === i) ||
+						(cell.bottom && index + cut === i) ||
+						(cell.left && index - 1 === i) ||
+						(cell.right && index + 1 === i) ||
+						(cell.right && cell.top && index + 1 - cut === i) ||
+						(cell.right && cell.bottom && index + 1 + cut === i) ||
+						(cell.left && cell.top && index - 1 - cut === i) ||
+						(cell.left && cell.bottom && index - 1 + cut === i)) &&
+					!cell.open &&
+					!cell.mine &&
+					!cell.check
+				) {
+					openCell();
+				}
+			}
+		});
+	}, [setMine, gameOver, cut]);
+>>>>>>> f84e627145a60f7d256776de2afc5e60542ad051
 	// reset state check open
 	useEffect(() => {
 		setCheck(false);

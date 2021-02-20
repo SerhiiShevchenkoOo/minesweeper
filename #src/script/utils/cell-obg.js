@@ -1,7 +1,7 @@
 /* eslint no-unused-expressions: 0 */
 /* eslint no-plusplus: 0 */
 
-function checkFieldPosition(top, bottom, right, left, cut = 9, arr, index) {
+function checkFieldPosition(top, bottom, right, left, cut, arr, index) {
 	let count = 0;
 	!arr[index].mine
 		? (top && arr[index - cut].mine && count++,
@@ -32,13 +32,13 @@ const setColors = i =>
 		? 'bg-pink-800'
 		: 'bg-pink-900';
 
-export default (mine, index, open, check, cut = 9, arr) => {
-	const coll = index % 9;
-	const row = (index - coll) / 9;
+export default (mine, index, open, check, cut, arr) => {
+	const coll = index % cut;
+	const row = (index - coll) / cut;
 	const top = row > 0;
-	const bottom = row < 8;
+	const bottom = row < cut - 1;
 	const left = coll > 0;
-	const right = coll < 8;
+	const right = coll < cut - 1;
 	const mineIndex = checkFieldPosition(
 		top,
 		bottom,
@@ -61,7 +61,6 @@ export default (mine, index, open, check, cut = 9, arr) => {
 		index,
 		open,
 		check,
-		image: mine && true,
 		mineIndex,
 	};
 };
