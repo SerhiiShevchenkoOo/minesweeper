@@ -60,7 +60,7 @@ export default (mine, index, open, check, cut, arr) => {
 		row,
 		index,
 		open,
-		check,
+		check: false,
 		mineIndex,
 	};
 };
