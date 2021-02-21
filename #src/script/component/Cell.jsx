@@ -1,180 +1,92 @@
 import React, { useState, useEffect } from 'react';
 import bomb from '@assets/images/bomb.svg';
 import checkImage from '@assets/images/error.svg';
-
+import storage from '@utils/storage.js';
+import next from '@utils/game-open-logic.js';
+import PropTypes from 'prop-types';
+import pause from '@utils/pause.js'; //delay
 const Cell = ({
 	cell,
 	index,
 	update,
 	arr,
 	newGame,
-	setMine,
+	setMineSensor,
 	setGameOver,
-	cut,
+	cut, // custom columns indexs
+	updatePoint,
+	reset,
 }) => {
-	const [open, setOpen] = useState(arr[index].open);
-	const [check, setCheck] = useState(false);
-	// open cell if next cell open
-	useEffect(() => {
-		setOpen(cell.open);
-	}, [update]);
-	// reset state check open
-	useEffect(() => {
-		setCheck(false);
-		setOpen(false);
-	}, [newGame, cut]);
-	// open cell
+	const [open, setOpen] = useState(cell.open); // open cell  true/false
+	const [check, setCheck] = useState(cell.check); // chack cell true/false
+	const [scale, setScale] = useState('');
 	const openCell = () => {
-		next(arr, index, cell);
-	};
+		cell.check && setMineSensor(false, arr); // if cell.checked> mineSensor++
+		next(arr, index, cell, updatePoint, setGameOver, update, cut); //
+	}; //Click
 	// set check
 	const checkedCell = e => {
 		e.preventDefault();
 		if (cell.open) return;
 		setCheck(!check);
-		!cell.check ? setMine(true, arr) : setMine(false, arr);
+		!cell.check ? setMineSensor(true, arr) : setMineSensor(false, arr);
 		cell.check = check;
-	};
-	cell.check = check;
-	function next(arr, index, cell) {
-		const left = arr[index - 1];
-		const right = arr[index + 1];
-		const top = arr[index - cut];
-		const bottom = arr[index + cut];
-		const bottomLeft = arr[index + cut - 1];
-		const bottomRight = arr[index + cut + 1];
-		const topLeft = arr[index - cut - 1];
-		const topRight = arr[index - cut + 1];
-		cell.open = true;
-		if (cell.mine && cell.open) {
-			arr.map(i => (i.open = true));
-			setGameOver(true);
-		}
-		if (
-			left &&
-			!left.mine &&
-			cell.left &&
-			cell.mineIndex === 0 &&
-			!left.check &&
-			!left.open
-		) {
-			left.open = true;
-			next(arr, left.index, left);
-		}
-		if (
-			right &&
-			!right.mine &&
-			cell.right &&
-			cell.mineIndex === 0 &&
-			!right.check &&
-			!right.open
-		) {
-			right.open = true;
-			next(arr, right.index, right);
-		}
-		if (
-			top &&
-			!top.mine &&
-			cell.top &&
-			cell.mineIndex === 0 &&
-			!top.open &&
-			!top.check
-		) {
-			top.open = true;
-			next(arr, top.index, top);
-		}
-		if (
-			bottom &&
-			!bottom.mine &&
-			cell.bottom &&
-			cell.mineIndex === 0 &&
-			!bottom.open &&
-			!bottom.check
-		) {
-			bottom.open = true;
-			next(arr, bottom.index, bottom);
-		}
-		if (
-			bottomLeft &&
-			!bottomLeft.mine &&
-			cell.bottom &&
-			cell.left &&
-			cell.mineIndex === 0 &&
-			!bottomLeft.open &&
-			!bottomLeft.check
-		) {
-			bottomLeft.open = true;
-			next(arr, bottomLeft.index, bottomLeft);
-		}
-		if (
-			bottomRight &&
-			!bottomRight.mine &&
-			cell.bottom &&
-			cell.right &&
-			cell.mineIndex === 0 &&
-			!bottomRight.open &&
-			!bottomRight.check
-		) {
-			bottomRight.open = true;
-			next(arr, bottomRight.index, bottomRight);
-		}
-		if (
-			bottomRight &&
-			!bottomRight.mine &&
-			cell.bottom &&
-			cell.right &&
-			cell.mineIndex === 0 &&
-			!bottomRight.open &&
-			!bottomRight.check
-		) {
-			bottomRight.open = true;
-			next(arr, bottomRight.index, bottomRight);
-		}
-		if (
-			topLeft &&
-			!topLeft.mine &&
-			cell.top &&
-			cell.left &&
-			cell.mineIndex === 0 &&
-			!topLeft.open &&
-			!topLeft.check
-		) {
-			topLeft.open = true;
-			next(arr, topLeft.index, topLeft);
-		}
-		if (
-			topRight &&
-			!topRight.mine &&
-			cell.bottom &&
-			cell.right &&
-			cell.mineIndex === 0 &&
-			!topRight.open &&
-			!topRight.check
-		) {
-			topRight.open = true;
-			next(arr, topRight.index, topRight);
-		}
+	}; // contextMenu event
+	// set bacground
+	const setBg = () =>
+		open
+			? !cell.mine
+				? cell.bg
+				: 'bg-yellow-50'
+			: check
+			? 'bg-purple-300'
+			: 'bg-gray-400';
 
-		update(arr);
-	}
+	cell.check = check;
+	useEffect(() => {
+		setOpen(cell.open);
+		setCheck(cell.check);
+	}, [update, checkedCell]); // open cell if next cell open
+	useEffect(() => {
+		reset && setCheck(false);
+		reset && setOpen(false);
+		if (storage.get('continue')) return;
+		setCheck(false);
+		setOpen(false);
+	}, [newGame, cut]); // if start new game/ change field size
 
 	return (
 		<button
+			onMouseOver={() => {
+				setScale('scale-75');
+			}}
+			onMouseOut={async () => {
+				await pause(0.5);
+				setScale('scale-100');
+			}}
 			onContextMenu={e => checkedCell(e)}
 			onClick={openCell}
-			className={`h-10 rounded-lg w-10 p-1 ${
-				open
-					? !cell.mine
-						? cell.bg
-						: 'bg-yellow-50'
-					: check
-					? 'bg-purple-300'
-					: 'bg-gray-400'
-			} transition duration-500 `}>
+			className={`h-full   w-full p-1 rounded-2xl  md:rounded-lg transition duration-1000 transform ${setBg()} ${scale}`}>
 			{open && cell.mineIndex > 0 && cell.mineIndex}
 			{cell.open && cell.mine && <img src={bomb} alt={bomb} />}
-			{!cell.open && check && <img src={checkImage} alt={checkImage} />}
+			{!cell.open && cell.check && <img src={checkImage} alt={checkImage} />}
 		</button>
 	);
 };
+
+Cell.propTypes = {
+	arr: PropTypes.array.isRequired,
+	index: PropTypes.number.isRequired,
+	cell: PropTypes.object.isRequired,
+	updatePoint: PropTypes.func.isRequired,
+	setGameOver: PropTypes.func.isRequired,
+	update: PropTypes.func.isRequired,
+	cut: PropTypes.func.isRequired,
+	newGame: PropTypes.bool.isRequired,
+	setGameOver: PropTypes.func.isRequired,
+	cut: PropTypes.number.isRequired,
+	setMineSensor: PropTypes.func.isRequired,
+	reset: PropTypes.bool.isRequired,
+};
+
 export default Cell;
