@@ -4,7 +4,8 @@ import checkImage from '@assets/images/error.svg';
 import storage from '@utils/storage.js';
 import next from '@utils/game-open-logic.js';
 import PropTypes from 'prop-types';
-import pause from '@utils/pause.js'; //delay
+import pause from '@utils/pause.js';
+
 const Cell = ({
 	cell,
 	index,
@@ -48,11 +49,13 @@ const Cell = ({
 		setCheck(cell.check);
 	}, [update, checkedCell]); // open cell if next cell open
 	useEffect(() => {
-		reset && setCheck(false);
-		reset && setOpen(false);
-		if (storage.get('continue')) return;
-		setCheck(false);
-		setOpen(false);
+		return () => {
+			reset && setCheck(false);
+			reset && setOpen(false);
+			if (storage.get('continue')) return;
+			setCheck(false);
+			setOpen(false);
+		};
 	}, [newGame, cut]); // if start new game/ change field size
 
 	return (
