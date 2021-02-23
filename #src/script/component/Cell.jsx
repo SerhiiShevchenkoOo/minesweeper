@@ -18,6 +18,7 @@ const Cell = ({
 	updatePoint,
 	reset,
 }) => {
+	const [cleanup, setCleanup] = useState(false);
 	const [open, setOpen] = useState(cell.open); // open cell  true/false
 	const [check, setCheck] = useState(cell.check); // chack cell true/false
 	const [scale, setScale] = useState('');
@@ -49,15 +50,15 @@ const Cell = ({
 		setCheck(cell.check);
 	}, [update, checkedCell]); // open cell if next cell open
 	useEffect(() => {
-		return () => {
-			reset && setCheck(false);
-			reset && setOpen(false);
-			if (storage.get('continue')) return;
-			setCheck(false);
-			setOpen(false);
-		};
+		reset && setCheck(false);
+		reset && setOpen(false);
+		if (storage.get('continue')) return;
+		setCheck(false);
+		setOpen(false);
 	}, [newGame, cut]); // if start new game/ change field size
-
+	useEffect(() => {
+		return () => setCleanup(true);
+	}, []); // reset scale
 	return (
 		<button
 			onMouseOver={() => {
@@ -65,7 +66,7 @@ const Cell = ({
 			}}
 			onMouseOut={async () => {
 				await pause(0.5);
-				setScale('scale-100');
+				!cleanup && setScale('scale-100');
 			}}
 			onContextMenu={e => checkedCell(e)}
 			onClick={openCell}
