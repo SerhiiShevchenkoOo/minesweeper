@@ -10,128 +10,180 @@ import Mine from './Mine.jsx';
 import playImage from '@assets/images/play.gif';
 import sadImage from '@assets/images/fail.gif';
 import victoryImage from '@assets/images/victory.gif';
+import Spinner from './Spinner.jsx';
 
 const Main = () => {
+	const [loader, setLoader] = useState(true);
 	const [victory, setVictory] = useState(false);
-	// set fieldSize
-	const [fieldSize, setFieldSize] = useState(fieldSizes.beginner.size);
-	//set start cellArr
-	const [arr, setArr] = useState([]);
-	//set check arr for index cell
-	const [c, setCheck] = useState(false);
-	// set new game
-	const [newGame, setNewGame] = useState(true);
-	// timer
+	const [point, setPoint] = useState(
+		storage.get('point') ? storage.get('point') : 0,
+	);
+	const [reset, setReset] = useState(false); // when click on button 'reset'
+	const [fieldSize, setFieldSize] = useState(
+		storage.get('continue')
+			? storage.get('continue').size
+			: fieldSizes.beginner.size,
+	); // set fieldSize
+	const [arr, setArr] = useState([]); //set start cellArr
+	const [c, setCheck] = useState(false); //set check arr for index cell
+	const [newGame, setNewGame] = useState(true); // set new game
+	const [time, setTime] = useState(0); //timer time
 	const [isActive, setIsActive] = useState(false);
-	//timer time
-	const [time, setTime] = useState(0);
-	//set mines
-	const [mines, setMines] = useState(fieldSizes.beginner.mine);
-	const [cut, setCut] = useState(fieldSizes.beginner.cut);
-	// set mine index for the indicator of the number of mine
-	const [minesIndex, setMinesIndex] = useState(mines);
+	const [mines, setMines] = useState(
+		storage.get('continue')
+			? storage.get('continue').mines
+			: fieldSizes.beginner.mine,
+	); //set mines
+	const [cut, setCut] = useState(
+		storage.get('continue')
+			? storage.get('continue').cut
+			: fieldSizes.beginner.cut,
+	); //custom columns
+	const [minesSensor, setMinesSensor] = useState(mines); // set mine index for the indicator of the number of mine
 	const [gameOver, setGameOver] = useState(false);
-	// update field when the cell opens ---------------
+	// function------------------------------------------
+	const setMineSensor = (e, arr) => {
+		e === true
+			? setMinesSensor(minesSensor - 1)
+			: setMinesSensor(minesSensor + 1);
+	};
+	const updatePoint = () => {
+		setPoint(Math.round((arr.filter(e => e.open).length * cut) / 10));
+	};
 	const update = arr => {
 		setArr(arr);
 		setCheck(!c);
-	};
-
-	// check win
-	useEffect(() => {
-		minesIndex === 0 &&
-			arr.filter(e => e.check && e.mine).length === mines &&
-			setVictory(true);
-	}, [minesIndex]);
-	// set start game field
-	useLayoutEffect(() => {
-		createField();
-	}, []);
-	// count for mine indecator
-	useEffect(() => {
-		createField();
-	}, [cut]);
-	const setMine = (e, arr) => {
-		e === true
-			? setMinesIndex(minesIndex - 1)
-			: setMinesIndex(minesIndex + 1);
-	};
-
-	// create field and set New field----------
-	const createField = () => {
-		let arr = [];
-		for (let i = 0; i < fieldSize; i++) {
-			let mine = i < mines;
-			arr.push({
-				mine: mine,
-				open: false,
-				check: false,
-			});
+	}; // update field when the cell opens ---------------
+	const createField = e => {
+		if (!storage.get('continue') || e) {
+			let arr = [];
+			for (let i = 0; i < fieldSize; i++) {
+				let mine = i < mines;
+				arr.push({ mine: mine, open: false, check: false });
+			}
+			shuffle(arr); // random arr
+			// add full cell{...}
+			arr = arr.map(
+				(cell, index, arr) =>
+					(cell = cellObg(
+						cell.mine,
+						index,
+						cell.open,
+						cell.check,
+						cut,
+						arr,
+					)),
+			); // add key for cell
+			setPoint(0);
+			setIsActive(!isActive);
+			setGameOver(false);
+			setVictory(false);
+			setMinesSensor(mines);
+			setTime(0);
+			setArr(arr);
+			setNewGame(!newGame);
+		} else {
+			setMinesSensor(storage.get('continue').minesSensor);
+			setCut(storage.get('continue').cut);
+			setGameOver(storage.get('continue').gameOver);
+			setArr(storage.get('continue').arr);
+			setPoint(storage.get('continue').point);
+			setTime(storage.get('time'));
 		}
-		// random arr
-		shuffle(arr);
-		// add full cell{...}
-		arr = arr.map(
-			(cell, index, arr) =>
-				(cell = cellObg(cell.mine, index, cell.open, cell.check, cut, arr)),
-		);
-
-		setIsActive(!isActive);
-		setTime(0);
-		setMinesIndex(mines);
-		setArr(arr);
-		setNewGame(!newGame);
-		setGameOver(false);
-		setVictory(false);
 	};
-	//---------------
-	const setSettingSize = (size, mine, cut) => {
-		setArr([]);
+	const setSettingSize = (size, mine, e) => {
+		storage.del('continue');
+		if (e === cut) return;
+		else {
+			setLoader(true);
+			setArr([]);
+			setCut(e);
+			setMines(mine);
+			setFieldSize(size);
+			setIsActive(!isActive);
+		}
+	}; //set new size
+
+	//------------effects -------------------------------
+	useEffect(() => {
+		if (
+			minesSensor === 0 &&
+			arr.filter(e => e.check && e.mine).length === mines
+		) {
+			setVictory(true);
+			storage.del('continue');
+		}
+	}, [minesSensor]); // chech end game
+	useEffect(() => {
 		setCut(cut);
-		setMines(mine);
-		setFieldSize(size);
-	};
+		createField();
+		return setLoader(false);
+	}, [cut, mines]); // update field when size change
+	useEffect(() => {
+		storage.set('continue', {
+			arr: arr,
+			cut: cut,
+			minesSensor: minesSensor,
+			mines: mines,
+			gameOver: gameOver,
+			point: point,
+			size: fieldSize,
+		});
+		storage.set('time', time);
 
+		gameOver && storage.del('continue');
+		victory && storage.del('continue');
+	}, [updatePoint, update, victory]); // add locale storage
+	//-------------------------------------------------------
 	return (
-		<div>
+		<div className='h-full w-screen flex flex-col justify-center items-center'>
 			<div className='flex  space-x-3'>
 				<button
 					className={'h-10 w-10 bg-yellow-600'}
-					onPointerDown={createField}></button>
+					onPointerDown={() => {
+						setReset(true);
+						createField(true);
+					}}></button>
 				<img
 					className={'h-20 w-20 '}
 					src={gameOver ? sadImage : victory ? victoryImage : playImage}
 					alt={'viiiu'}
 				/>
-				<Mine mine={minesIndex} />
-				<Timer isActive={isActive} time={time} />
+				<Mine mine={minesSensor} />
+				<Timer time={time} isActive={isActive} setTime={setTime} />
+				<div className='h-10 w-10 bg-red-600'>{point}</div>
 			</div>
-			<div
-				className={`${
-					cut === 9
-						? 'grid-cols-9'
-						: cut === 16
-						? 'grid-cols-16'
-						: 'grid-cols-30'
-				} gap-1 grid trans`}>
-				{arr.map((cell, index, arr) => {
-					return (
-						<div key={index}>
-							<Cell
-								cell={cell}
-								index={index}
-								update={update}
-								arr={arr}
-								newGame={newGame}
-								setMine={setMine}
-								setGameOver={setGameOver}
-								cut={cut}
-								gh={c}
-							/>
-						</div>
-					);
-				})}
-			</div>
+			{loader ? (
+				<Spinner />
+			) : (
+				<div
+					className={` ${
+						cut === 9
+							? 'grid-cols-9t md:grid-cols-9 md:auto-rows-1 '
+							: cut === 16
+							? 'grid-cols-16t md:grid-cols-16 md:auto-rows-1'
+							: 'grid-cols-30t md:grid-cols-30 md:auto-rows-2'
+					} gap-1 grid max-w-full overflow-auto  max-h-full  auto-rows-t`}>
+					{arr.map((cell, index, arr) => {
+						return (
+							<div key={index} className='shadow-2xl'>
+								<Cell
+									cell={cell}
+									index={index}
+									update={update}
+									arr={arr}
+									newGame={newGame}
+									setMineSensor={setMineSensor}
+									setGameOver={setGameOver}
+									cut={cut}
+									updatePoint={updatePoint}
+									reset={reset}
+								/>
+							</div>
+						);
+					})}
+				</div>
+			)}
 			<div className='flex space-x-3'>
 				{Object.entries(fieldSizes).map(c => (
 					<button
