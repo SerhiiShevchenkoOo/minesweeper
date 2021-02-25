@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import bomb from '@assets/images/bomb.svg';
 import checkImage from '@assets/images/error.svg';
 import storage from '@utils/storage.js';
 import next from '@utils/game-open-logic.js';
 import PropTypes from 'prop-types';
 import pause from '@utils/pause.js';
+import { Context } from '../utils/Context';
+import { activeSong } from '@assets/songs/song.js';
 
 const Cell = ({
 	cell,
@@ -18,6 +20,9 @@ const Cell = ({
 	updatePoint,
 	reset,
 }) => {
+	const { contextValue, ContextActive } = useContext(Context);
+	const [speakOn, setSpeakOn] = ContextActive;
+	const [speakValue, setSpeakValue] = contextValue;
 	const [cleanup, setCleanup] = useState(false);
 	const [open, setOpen] = useState(cell.open); // open cell  true/false
 	const [check, setCheck] = useState(cell.check); // chack cell true/false
@@ -28,7 +33,7 @@ const Cell = ({
 	}; //Click
 	// set check
 	const checkedCell = e => {
-		e.preventDefault();
+		e && e.preventDefault();
 		if (cell.open) return;
 		setCheck(!check);
 		!cell.check ? setMineSensor(true, arr) : setMineSensor(false, arr);
@@ -59,6 +64,15 @@ const Cell = ({
 	useEffect(() => {
 		return () => setCleanup(true);
 	}, []); // reset scale
+	useEffect(() => {
+		const numberCell = speakValue.split(' ')[0];
+		const move = speakValue.split(' ')[1];
+		if (+numberCell === index) {
+			console.log(move);
+			move === 'открыть' && openCell();
+			move == 'закрыть' && checkedCell();
+		}
+	}, [speakValue]);
 	return (
 		<button
 			onMouseOver={() => {
@@ -74,6 +88,9 @@ const Cell = ({
 			{open && cell.mineIndex > 0 && cell.mineIndex}
 			{cell.open && cell.mine && <img src={bomb} alt={bomb} />}
 			{!cell.open && cell.check && <img src={checkImage} alt={checkImage} />}
+			{speakOn && !cell.open && !cell.check && (
+				<p className={'text-sm'}>{index}</p>
+			)}
 		</button>
 	);
 };

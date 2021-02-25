@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, lazy } from 'react';
+import React, { useState, useEffect, useContext, lazy } from 'react';
 import style from '@style/style.js';
 import shuffle from '@utils/shuffle.js';
 import storage from '@utils/storage.js';
@@ -11,7 +11,7 @@ import playImage from '@assets/images/play.gif';
 import sadImage from '@assets/images/fail.gif';
 import victoryImage from '@assets/images/victory.gif';
 import Spinner from './Spinner.jsx';
-
+import Btn from './New-game-btn.jsx';
 const Main = () => {
 	const [loader, setLoader] = useState(true);
 	const [victory, setVictory] = useState(false);
@@ -135,24 +135,30 @@ const Main = () => {
 		victory && storage.del('continue');
 	}, [updatePoint, update, victory]); // add locale storage
 	//-------------------------------------------------------
+
 	return (
-		<div className='h-full w-screen flex flex-col justify-center items-center'>
-			<div className='flex  space-x-3'>
-				<button
-					className={'h-10 w-10 bg-yellow-600'}
-					onPointerDown={() => {
-						setReset(true);
-						createField(true);
-					}}></button>
+		<div
+			onContextMenu={e => e.preventDefault()}
+			className='h-full w-screen flex flex-col justify-center items-center'>
+			{/* newGameButton----------------------------------------------------------------------------- */}
+			<div className='flex flex-wrap items-center w-4/5 md:w-3/4 justify-between'>
+				<Btn createField={createField} setReset={setReset} />
+				{/* gameImage----------------------------------------------------------------------------- */}
 				<img
 					className={'h-20 w-20 '}
 					src={gameOver ? sadImage : victory ? victoryImage : playImage}
 					alt={'viiiu'}
 				/>
+				{/* mineSensor----------------------------------------------------------------------------- */}
 				<Mine mine={minesSensor} />
+				{/* timer----------------------------------------------------------------------------- */}
 				<Timer time={time} isActive={isActive} setTime={setTime} />
-				<div className='h-10 w-10 bg-red-600'>{point}</div>
+				{/* point----------------------------------------------------------------------------- */}
+				<div className='bg-black px-2 py-1 rounded-xl font-medium text-xl  text-yellow-500 justify-center flex items-center'>
+					<p>Points:{point}</p>
+				</div>
 			</div>
+			{/* field----------------------------------------------------------------------------- */}
 			{loader ? (
 				<Spinner />
 			) : (
@@ -166,7 +172,9 @@ const Main = () => {
 					} gap-1 grid max-w-full overflow-auto  max-h-full  auto-rows-t`}>
 					{arr.map((cell, index, arr) => {
 						return (
-							<div key={index} className='shadow-2xl'>
+							<div
+								key={index}
+								className='shadow-2xl rounded-2xl  md:rounded-lg'>
 								<Cell
 									cell={cell}
 									index={index}
@@ -184,12 +192,13 @@ const Main = () => {
 					})}
 				</div>
 			)}
+			{/* fieldSize setting----------------------------------------------------------------------------- */}
 			<div className='flex space-x-3'>
 				{Object.entries(fieldSizes).map(c => (
 					<button
 						onClick={() => setSettingSize(c[1].size, c[1].mine, c[1].cut)}
 						key={c[0]}
-						className='h-10 w-10 bg-pink-600'>
+						className='bg-black px-2 py-1 rounded-xl font-medium text-xl  text-yellow-500'>
 						{c[0]}
 					</button>
 				))}
