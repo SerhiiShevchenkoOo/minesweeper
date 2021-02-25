@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 const Mine = ({ mine }) => {
-	return <div>{mine}</div>;
+	return (
+		<div className=' bg-black px-2 py-1 rounded-xl font-medium text-xl  text-yellow-500 flex justify-center items-center'>
+			<p>Mines:{mine}</p>
+		</div>
+	);
 };
 export default Mine;
