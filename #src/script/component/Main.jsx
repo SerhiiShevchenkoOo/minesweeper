@@ -146,9 +146,9 @@ const Main = () => {
 	return (
 		<div
 			onContextMenu={e => e.preventDefault()}
-			className='h-full w-screen flex flex-col justify-center items-center'>
+			className='h-full w-screen flex flex-col justify-between items-center'>
 			{/* newGameButton----------------------------------------------------------------------------- */}
-			<div className='flex flex-wrap items-center w-4/5 md:w-3/4 justify-between'>
+			<div className='flex flex-wrap  items-center w-4/5 md:w-3/4 justify-between'>
 				<Btn createField={createField} setReset={setReset} />
 				{/* gameImage----------------------------------------------------------------------------- */}
 				<img
@@ -161,7 +161,7 @@ const Main = () => {
 				{/* timer----------------------------------------------------------------------------- */}
 				<Timer time={time} isActive={isActive} setTime={setTime} />
 				{/* point----------------------------------------------------------------------------- */}
-				<div className='bg-black px-2 py-1 rounded-xl font-medium text-xl  text-yellow-500 justify-center flex items-center'>
+				<div className='bg-black px-2 py-1  rounded-xl font-medium text-xl  text-yellow-500 justify-center flex items-center'>
 					<p>Points:{point}</p>
 				</div>
 			</div>
@@ -176,7 +176,7 @@ const Main = () => {
 							: cut === 16
 							? 'grid-cols-16t md:grid-cols-16 md:auto-rows-1'
 							: 'grid-cols-30t md:grid-cols-30 md:auto-rows-2'
-					} gap-1 grid max-w-full overflow-auto  max-h-full  auto-rows-t`}>
+					} gap-1 grid max-w-full overflow-auto  max-h-full m-h-3/4	  auto-rows-t`}>
 					{arr.map((cell, index, arr) => {
 						return (
 							<div

@@ -1,15 +1,22 @@
 import React, { useState, useEffect, useContext } from 'react';
 import pause from '@utils/pause.js';
 import { Context } from '../utils/Context';
+import useSound from 'use-sound';
+import newGameSong from '@assets/songs/switch-on.mp3';
 
 const Btn = ({ setReset, createField }) => {
-	const { contextValue, ContextActive } = useContext(Context);
+	const { contextValue, ContextActive, volume } = useContext(Context);
 	const [btnActive, setBtnActive] = useState('');
 	const [speakValue, setSpeakValue] = contextValue;
 	const setNewGame = () => {
 		setReset(true);
 		createField(true);
 	};
+	const [playbackRate, setPlaybackRate] = volume;
+	const [play] = useSound(newGameSong, {
+		playbackRate,
+		volume: playbackRate,
+	});
 	useEffect(() => {
 		speakValue === 'новая игра' && setNewGame();
 	}, [speakValue]);
@@ -20,7 +27,7 @@ const Btn = ({ setReset, createField }) => {
 			onPointerDown={async () => {
 				if (setBtnActive === 'scale-90') return;
 				setNewGame();
-
+				play();
 				setBtnActive('scale-90');
 				await pause(0.3);
 				setBtnActive('scale-100');

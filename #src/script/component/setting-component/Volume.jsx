@@ -4,7 +4,6 @@ import { Context } from '@utils/Context.jsx';
 import volumeUp from '@assets/songs/rising-pops.mp3';
 import boomboxImage from '@assets/images/boombox.svg';
 import song from '@assets/songs/song.js';
-import shuffle from '@utils/shuffle.js';
 
 function randomInteger(min, max) {
 	// случайное число от min до (max+1)
