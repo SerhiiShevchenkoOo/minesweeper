@@ -1,4 +1,12 @@
-function next(arr, index, cell, updatePoint, setGameOver, update, cut) {
+function checkNextCell(
+	arr,
+	index,
+	cell,
+	updatePoint,
+	setGameOver,
+	update,
+	cut,
+) {
 	const left = arr[index - 1];
 	const right = arr[index + 1];
 	const top = arr[index - cut];
@@ -8,6 +16,10 @@ function next(arr, index, cell, updatePoint, setGameOver, update, cut) {
 	const topLeft = arr[index - cut - 1];
 	const topRight = arr[index - cut + 1];
 	cell.open = true;
+	//[topLeft,    top,       topRight]
+	//[left,       this.cell, right]
+	//[bottomLeft, bottom,    bottomRight
+	//position cell)
 
 	updatePoint();
 	if (cell.mine && cell.open) {
@@ -24,7 +36,15 @@ function next(arr, index, cell, updatePoint, setGameOver, update, cut) {
 		!left.open
 	) {
 		left.open = true;
-		next(arr, left.index, left, updatePoint, setGameOver, update, cut);
+		checkNextCell(
+			arr,
+			left.index,
+			left,
+			updatePoint,
+			setGameOver,
+			update,
+			cut,
+		);
 	}
 	if (
 		right &&
@@ -35,7 +55,15 @@ function next(arr, index, cell, updatePoint, setGameOver, update, cut) {
 		!right.open
 	) {
 		right.open = true;
-		next(arr, right.index, right, updatePoint, setGameOver, update, cut);
+		checkNextCell(
+			arr,
+			right.index,
+			right,
+			updatePoint,
+			setGameOver,
+			update,
+			cut,
+		);
 	}
 	if (
 		top &&
@@ -46,7 +74,7 @@ function next(arr, index, cell, updatePoint, setGameOver, update, cut) {
 		!top.check
 	) {
 		top.open = true;
-		next(arr, top.index, top, updatePoint, setGameOver, update, cut);
+		checkNextCell(arr, top.index, top, updatePoint, setGameOver, update, cut);
 	}
 	if (
 		bottom &&
@@ -57,7 +85,15 @@ function next(arr, index, cell, updatePoint, setGameOver, update, cut) {
 		!bottom.check
 	) {
 		bottom.open = true;
-		next(arr, bottom.index, bottom, updatePoint, setGameOver, update, cut);
+		checkNextCell(
+			arr,
+			bottom.index,
+			bottom,
+			updatePoint,
+			setGameOver,
+			update,
+			cut,
+		);
 	}
 	if (
 		bottomLeft &&
@@ -69,7 +105,7 @@ function next(arr, index, cell, updatePoint, setGameOver, update, cut) {
 		!bottomLeft.check
 	) {
 		bottomLeft.open = true;
-		next(
+		checkNextCell(
 			arr,
 			bottomLeft.index,
 			bottomLeft,
@@ -94,7 +130,7 @@ function next(arr, index, cell, updatePoint, setGameOver, update, cut) {
 		!bottomRight.check
 	) {
 		bottomRight.open = true;
-		next(
+		checkNextCell(
 			arr,
 			bottomRight.index,
 			bottomRight,
@@ -114,7 +150,15 @@ function next(arr, index, cell, updatePoint, setGameOver, update, cut) {
 		!topLeft.check
 	) {
 		topLeft.open = true;
-		next(arr, topLeft.index, topLeft, updatePoint, setGameOver, update, cut);
+		checkNextCell(
+			arr,
+			topLeft.index,
+			topLeft,
+			updatePoint,
+			setGameOver,
+			update,
+			cut,
+		);
 	}
 	if (
 		topRight &&
@@ -126,7 +170,7 @@ function next(arr, index, cell, updatePoint, setGameOver, update, cut) {
 		!topRight.check
 	) {
 		topRight.open = true;
-		next(
+		checkNextCell(
 			arr,
 			topRight.index,
 			topRight,
@@ -139,4 +183,4 @@ function next(arr, index, cell, updatePoint, setGameOver, update, cut) {
 	update(arr);
 }
 
-export default next;
+export default checkNextCell;
