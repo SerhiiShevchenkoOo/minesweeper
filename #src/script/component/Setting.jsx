@@ -1,41 +1,29 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Context } from '../utils/Context';
+import React, { useState } from 'react';
+import Speaker from './setting-component/Speaker';
+import Volume from './setting-component/Volume';
+import settingImg from '@assets/images/setting.gif';
+import settingUpImg from '@assets/images/settingUp.gif';
 const Setting = props => {
-	const { contextValue, ContextActive } = useContext(Context);
-	const [speakValue, setSpeakValue] = contextValue;
-	const [active, setActive] = ContextActive;
-	const SpeechRecognition = new (window.SpeechRecognition ||
-		window.webkitSpeechRecognition ||
-		window.mozSpeechRecognition ||
-		window.msSpeechRecognition)();
-	SpeechRecognition.lang = 'ru-Ru';
-	SpeechRecognition.onresult = function (event) {
-		const transcript = Array.from(event.results)
-			.map(result => result[0])
-			.map(result => result.transcript)
-			.join('');
-		let poopScript = transcript
-			.replace(/закрой|закрыто|заказать|закыт/gi, 'закрыть')
-			.replace(/открыто/gi, 'открыть')
-			.replace(/four/gi, '4');
-
-		setSpeakValue(poopScript);
-		console.log(poopScript);
-	};
-	SpeechRecognition.onend = function () {
-		SpeechRecognition.start();
-	};
-	useEffect(() => {
-		console.log(active);
-		active ? SpeechRecognition.start() : SpeechRecognition.stop();
-	}, [active]);
-	const setSpeach = () => {
-		setActive(!active);
-	};
+	const [navOpen, setnavOpen] = useState(false);
 
 	return (
-		<div className='h-full w-40 bg-yellow-500  absolute top-0 left-0'>
-			<button onClick={() => setSpeach()}>dkkdk</button>
+		<div
+			className={`${
+				!navOpen && '-translate-x-full'
+			} h-full w-full md:w-1/2 flex flex-col justify-center items-center z-20 
+			bg-yellow-500 transition-all duration-500 transform  fixed top-0 left-0
+		
+			
+			`}>
+			<button
+				onClick={() => setnavOpen(!navOpen)}
+				className={`h-12 w-12 border border-indigo-400 overflow-hidden	rounded-xl transition transform bg-gray-600 absolute right-0 top-0
+				${!navOpen && 'translate-x-full'}
+				`}>
+				<img src={navOpen ? settingImg : settingUpImg} alt='setting' />
+			</button>
+			<Speaker />
+			<Volume />
 		</div>
 	);
 };
