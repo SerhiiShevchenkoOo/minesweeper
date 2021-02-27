@@ -12,6 +12,8 @@ import sadImage from '@assets/images/fail.gif';
 import victoryImage from '@assets/images/victory.gif';
 import Spinner from './Spinner.jsx';
 import Btn from './New-game-btn.jsx';
+import FieldSizeBtn from './Field-size-btn.jsx';
+
 const Main = () => {
 	const [loader, setLoader] = useState(true);
 	const [victory, setVictory] = useState(false);
@@ -42,18 +44,22 @@ const Main = () => {
 	const [minesSensor, setMinesSensor] = useState(mines); // set mine index for the indicator of the number of mine
 	const [gameOver, setGameOver] = useState(false);
 	// function------------------------------------------
+
 	const setMineSensor = (e, arr) => {
 		e === true
 			? setMinesSensor(minesSensor - 1)
 			: setMinesSensor(minesSensor + 1);
-	};
+	}; // set mineSensor
+
 	const updatePoint = () => {
 		setPoint(Math.round((arr.filter(e => e.open).length * cut) / 10));
-	};
+	}; // setNewPoint
+
 	const update = arr => {
 		setArr(arr);
 		setCheck(!c);
 	}; // update field when the cell opens ---------------
+
 	const createField = e => {
 		if (!storage.get('continue') || e) {
 			let arr = [];
@@ -90,7 +96,8 @@ const Main = () => {
 			setPoint(storage.get('continue').point);
 			setTime(storage.get('time'));
 		}
-	};
+	}; // create New game field
+
 	const setSettingSize = (size, mine, e) => {
 		storage.del('continue');
 		if (e === cut) return;
@@ -193,16 +200,10 @@ const Main = () => {
 				</div>
 			)}
 			{/* fieldSize setting----------------------------------------------------------------------------- */}
-			<div className='flex space-x-3'>
-				{Object.entries(fieldSizes).map(c => (
-					<button
-						onClick={() => setSettingSize(c[1].size, c[1].mine, c[1].cut)}
-						key={c[0]}
-						className='bg-black px-2 py-1 rounded-xl font-medium text-xl  text-yellow-500'>
-						{c[0]}
-					</button>
-				))}
-			</div>
+			<FieldSizeBtn
+				fieldSizes={fieldSizes}
+				setSettingSize={setSettingSize}
+			/>
 		</div>
 	);
 };
