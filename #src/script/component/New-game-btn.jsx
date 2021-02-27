@@ -11,8 +11,7 @@ const Btn = ({ setReset, createField }) => {
 		createField(true);
 	};
 	useEffect(() => {
-		const reset = speakValue.split(' ')[0];
-		reset === 'новая' && setNewGame();
+		speakValue === 'новая игра' && setNewGame();
 	}, [speakValue]);
 	return (
 		<button
