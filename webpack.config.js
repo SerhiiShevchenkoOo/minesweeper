@@ -6,7 +6,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetPlugin = require('optimize-css-assets-webpack-plugin');
 const TerserWebpackPlugin = require('terser-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
-
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const isDev = process.env.NODE_ENV === 'development';
 const isProd = !isDev;
 
@@ -86,6 +86,7 @@ module.exports = {
 	},
 
 	plugins: [
+		new FaviconsWebpackPlugin('./llama.png'),
 		new ESLintPlugin(),
 		new HTMLWebpackPlugin({
 			filename: 'index.html',
@@ -138,6 +139,10 @@ module.exports = {
 			{
 				test: /\.(png|jpg|svg|gif|webp)$/,
 				type: 'asset/resource',
+			},
+			{
+				test: /\.(mp3|wav)$/,
+				use: 'file-loader',
 			},
 
 			{
