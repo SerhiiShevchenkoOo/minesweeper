@@ -6,7 +6,15 @@ import pause from '@utils/pause.js';
 import winSong from '@assets/songs/win.mp3';
 import loseSong from '@assets/songs/lose.mp3';
 
-const EndGamePopup = ({ victory, gameOver, time, point, cut, createField }) => {
+const EndGamePopup = ({
+	victory,
+	gameOver,
+	time,
+	point,
+	cut,
+	createField,
+	setReset,
+}) => {
 	const { volume } = useContext(Context);
 	const [playbackRate, setPlaybackRate] = volume;
 	const [opacity, setopacity] = useState('opacity-100');
@@ -66,7 +74,7 @@ const EndGamePopup = ({ victory, gameOver, time, point, cut, createField }) => {
 						storage.set('score', scoreArr);
 						setopacity('opacity-0');
 						await pause(0.7);
-						storage.del('continue');
+						setReset(true);
 						createField();
 						setopacity('opacity-100');
 					}}

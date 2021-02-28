@@ -10,7 +10,7 @@ module.exports = {
 				'16t': 'repeat(16, minmax(45px, 45px))',
 				'30t': 'repeat(30, minmax(45px, 45px))',
 				'9t': 'repeat(9, minmax(45px, 45px))',
-				'5t': 'repeat(5, minmax(80px, 45px))',
+				'5t': 'repeat(5, minmax(80px, 1fr))',
 			},
 			gridAutoRows: {
 				1: '30px',

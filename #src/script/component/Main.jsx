@@ -205,6 +205,7 @@ const Main = () => {
 						point={point}
 						cut={cut}
 						createField={createField}
+						setReset={setReset}
 					/>
 				</div>
 			)}
