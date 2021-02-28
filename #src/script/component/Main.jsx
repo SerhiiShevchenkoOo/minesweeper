@@ -13,6 +13,7 @@ import victoryImage from '@assets/images/victory.gif';
 import Spinner from './Spinner.jsx';
 import Btn from './New-game-btn.jsx';
 import FieldSizeBtn from './Field-size-btn.jsx';
+import EndGamePopup from './EndGamePopup.jsx';
 
 const Main = () => {
 	const [loader, setLoader] = useState(true);
@@ -176,7 +177,7 @@ const Main = () => {
 							: cut === 16
 							? 'grid-cols-16t md:grid-cols-16 md:auto-rows-1'
 							: 'grid-cols-30t md:grid-cols-30 md:auto-rows-2'
-					} gap-1 grid max-w-full overflow-auto  max-h-full m-h-3/4	  auto-rows-t`}>
+					} gap-1 grid max-w-full overflow-auto  max-h-full m-h-3/4	relative  auto-rows-t`}>
 					{arr.map((cell, index, arr) => {
 						return (
 							<div
@@ -197,6 +198,14 @@ const Main = () => {
 							</div>
 						);
 					})}
+					<EndGamePopup
+						victory={victory}
+						gameOver={gameOver}
+						time={time}
+						point={point}
+						cut={cut}
+						createField={createField}
+					/>
 				</div>
 			)}
 			{/* fieldSize setting----------------------------------------------------------------------------- */}
