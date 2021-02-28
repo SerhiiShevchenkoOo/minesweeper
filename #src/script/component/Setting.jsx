@@ -8,6 +8,7 @@ import { Context } from '@utils/Context.jsx';
 import useSound from 'use-sound';
 import Score from './setting-component/Score.jsx';
 import Footer from './setting-component/Footer.jsx';
+import Rules from './setting-component/Rules.jsx';
 
 const Setting = props => {
 	const [navOpen, setnavOpen] = useState(false);
@@ -22,8 +23,8 @@ const Setting = props => {
 		<div
 			className={`${
 				!navOpen && '-translate-x-full'
-			} h-full w-full md:w-1/2 flex flex-col justify-center items-center z-20 
-			bg-yellow-500 transition-all duration-500 transform  fixed top-0 left-0	
+			} h-full w-full md:w-1/2 flex  justify-center items-center z-20 
+			bg-black bg-opacity-60 transition-all duration-500 transform  fixed top-0 left-0	
 			`}>
 			<button
 				onClick={() => {
@@ -31,14 +32,17 @@ const Setting = props => {
 					setnavOpen(!navOpen);
 				}}
 				className={`h-12 w-12 border border-indigo-400 overflow-hidden	rounded-xl transition transform bg-gray-600 absolute right-0 top-0
-				${!navOpen && 'translate-x-full'}
-				`}>
+					${!navOpen && 'translate-x-full'}
+					`}>
 				<img src={navOpen ? settingImg : settingUpImg} alt='setting' />
 			</button>
-			<Speaker />
-			<Volume />
-			{/* <Score />
-			<Footer /> */}
+			<div className={` grid grid-cols-1`}>
+				<Speaker />
+				<Volume />
+				<Rules />
+				<Score />
+				<Footer />
+			</div>
 		</div>
 	);
 };

@@ -43,10 +43,20 @@ const Speaker = () => {
 
 	return (
 		<button
-			className={`p-1 h-14 w-14 flex space-x-2 `}
+			className={`p-1  flex items-center justify-around`}
 			onClick={() => setSpeach()}>
-			<img className={`${active && 'snake'}`} src={micImg} alt='speaker' />
-			<p className={` text-xl font-bold`}> {active ? 'on' : 'off'}</p>
+			<img
+				className={`${
+					active && 'snake'
+				} h-14  transition-all transform duration-300  hover:scale-90`}
+				src={micImg}
+				alt='speaker'
+			/>
+			<p
+				className={` text-xl font-bold  transition-all transform duration-300  hover:scale-90`}>
+				{' '}
+				{active ? 'on' : 'off'}
+			</p>
 		</button>
 	);
 };

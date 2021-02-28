@@ -5,12 +5,6 @@ import volumeUp from '@assets/songs/rising-pops.mp3';
 import boomboxImage from '@assets/images/boombox.svg';
 import song from '@assets/songs/song.js';
 
-function randomInteger(min, max) {
-	// случайное число от min до (max+1)
-	let rand = min + Math.random() * (max + 1 - min);
-	return Math.floor(rand);
-}
-
 const Volume = () => {
 	const [music, setMusic] = useState(false);
 	const { volume } = useContext(Context);
@@ -38,7 +32,7 @@ const Volume = () => {
 	};
 
 	return (
-		<div className={`flex  space-x-1`}>
+		<div className={`flex  justify-between`}>
 			<button
 				className={`transform focus:outline-none  active:scale-105   relative`}
 				onClick={() => handleClick(true)}
@@ -46,7 +40,10 @@ const Volume = () => {
 					e.preventDefault();
 					handleClick(false);
 				}}>
-				<span role='img' className=' text-5xl' aria-label='Heart'>
+				<span
+					role='img'
+					className=' transition-all transform duration-300  hover:scale-90 text-5xl'
+					aria-label='Heart'>
 					💖
 					<span
 						className={`absolute top-2/5 right-1/2 text-white 
@@ -61,7 +58,9 @@ const Volume = () => {
 			</button>
 			<button
 				onClick={handlerMusic}
-				className={` w-20 h-full ${music && 'snake'}`}>
+				className={` w-20 h-full ${
+					music && 'snake'
+				}  transition-all transform duration-300  hover:scale-90`}>
 				<img src={boomboxImage} alt='boomboxImage' />
 			</button>
 		</div>
