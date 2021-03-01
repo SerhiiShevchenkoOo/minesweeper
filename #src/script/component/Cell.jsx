@@ -19,6 +19,7 @@ const Cell = ({
 	cut, // custom columns indexs
 	updatePoint,
 	reset,
+	setactiveCellIndex,
 }) => {
 	const { contextValue, ContextActive, volume } = useContext(Context);
 	const [playbackRate, setPlaybackRate] = volume;
@@ -37,6 +38,7 @@ const Cell = ({
 	});
 
 	const openCell = () => {
+		setactiveCellIndex(index);
 		cell.check && setMineSensor(false, arr); // if cell.checked> mineSensor++
 		!cell.open && !cell.mine && playClick();
 		checkNextCell(arr, index, cell, updatePoint, setGameOver, update, cut); //
@@ -89,7 +91,9 @@ const Cell = ({
 			move == '-' && checkedCell();
 		}
 	}, [speakValue]);
-
+	const handlerKey = e => {
+		e.key === 'Control' && checkedCell();
+	};
 	return (
 		<button
 			onMouseOver={() => {
@@ -100,8 +104,9 @@ const Cell = ({
 				!cleanup && setScale('scale-100');
 			}}
 			onContextMenu={e => checkedCell(e)}
+			onKeyDown={handlerKey.bind(this)}
 			onClick={openCell}
-			className={`h-full   w-full p-1 rounded-2xl  md:rounded-lg transition duration-1000 transform ${setBg()} ${scale}`}>
+			className={`h-full shadow-md	 w-full p-1 rounded-2xl  md:rounded-lg transition duration-1000 transform ${setBg()} ${scale}`}>
 			{open && cell.mineIndex > 0 && cell.mineIndex}
 			{cell.open && cell.mine && <img src={bomb} alt={bomb} />}
 			{!cell.open && cell.check && <img src={checkImage} alt={checkImage} />}

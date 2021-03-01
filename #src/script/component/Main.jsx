@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, lazy } from 'react';
-import style from '@style/style.js';
+import arrowControl from '@utils/arrow-control.js';
 import shuffle from '@utils/shuffle.js';
 import storage from '@utils/storage.js';
 import cellObg from '@utils/cell-obg.js';
@@ -142,10 +142,13 @@ const Main = () => {
 		gameOver && storage.del('continue');
 		victory && storage.del('continue');
 	}, [updatePoint, update, victory]); // add locale storage
-	//-------------------------------------------------------
-
+	//------------------------------------------------------
+	const [activeCellIndex, setactiveCellIndex] = useState(0);
 	return (
 		<div
+			onKeyDown={e =>
+				arrowControl(e, cut, setactiveCellIndex, activeCellIndex)
+			}
 			onContextMenu={e => e.preventDefault()}
 			className='h-full w-screen flex flex-col justify-between items-center'>
 			{/* newGameButton----------------------------------------------------------------------------- */}
@@ -171,6 +174,7 @@ const Main = () => {
 				<Spinner />
 			) : (
 				<div
+					id='field'
 					className={` ${
 						cut === 9
 							? 'grid-cols-9t md:grid-cols-9 md:auto-rows-1 '
@@ -180,9 +184,7 @@ const Main = () => {
 					} gap-1 grid max-w-full overflow-auto  max-h-full m-h-3/4	relative  auto-rows-t`}>
 					{arr.map((cell, index, arr) => {
 						return (
-							<div
-								key={index}
-								className='shadow-2xl rounded-2xl  md:rounded-lg'>
+							<React.Fragment key={index}>
 								<Cell
 									cell={cell}
 									index={index}
@@ -194,8 +196,9 @@ const Main = () => {
 									cut={cut}
 									updatePoint={updatePoint}
 									reset={reset}
+									setactiveCellIndex={setactiveCellIndex}
 								/>
-							</div>
+							</React.Fragment>
 						);
 					})}
 					<EndGamePopup
