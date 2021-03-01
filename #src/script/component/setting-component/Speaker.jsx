@@ -44,7 +44,13 @@ const Speaker = () => {
 	return (
 		<button
 			className={`p-1  flex items-center justify-around`}
-			onClick={() => setSpeach()}>
+			onClick={() => {
+				!active &&
+					alert(
+						`Нужно сказать номер клетки затем плюс(открыть) или минус(чек) первым должно быть число вторым команда. Фраза новая игра начинает как не странно новую игру) для наглядности в консоль будет выводиться текущее значение фразы...ем, да, сказать верно не так просто)`,
+					);
+				setSpeach();
+			}}>
 			<img
 				className={`${
 					active && 'snake'
@@ -62,23 +68,3 @@ const Speaker = () => {
 };
 
 export default Speaker;
-// const SpeechRecognition = new (window.SpeechRecognition ||
-// 	window.webkitSpeechRecognition ||
-// 	window.mozSpeechRecognition ||
-// 	window.msSpeechRecognition)();
-// SpeechRecognition.lang = 'ru-Ru';
-// SpeechRecognition.onresult = function (event) {
-// 	const transcript = Array.from(event.results)
-// 		.map(result => result[0])
-// 		.map(result => result.transcript)
-// 		.join('');
-// 	let poopScript = transcript
-// 		.replace(/закрой|закрыто|заказать|закыт/gi, 'закрыть')
-// 		.replace(/открыто/gi, 'открыть');
-
-// 	setSpeakValue(poopScript);
-// 	console.log(poopScript);
-// };
-// SpeechRecognition.onend = function () {
-// 	active && SpeechRecognition.start();
-// };
