@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, lazy } from 'react';
+import React, { useState, useEffect, useRef, lazy } from 'react';
 import arrowControl from '@utils/arrow-control.js';
 import shuffle from '@utils/shuffle.js';
 import storage from '@utils/storage.js';
@@ -143,7 +143,16 @@ const Main = () => {
 		victory && storage.del('continue');
 	}, [updatePoint, update, victory]); // add locale storage
 	//------------------------------------------------------
+
+	const ref = useRef(null);
 	const [activeCellIndex, setactiveCellIndex] = useState(0);
+	useEffect(() => {
+		window.addEventListener('keydown', e => {
+			e.code == 'Space' &&
+				(setactiveCellIndex(0), ref.current.children[0].focus());
+		});
+	}, []);
+
 	return (
 		<div
 			onKeyDown={e =>
@@ -174,6 +183,7 @@ const Main = () => {
 				<Spinner />
 			) : (
 				<div
+					ref={ref}
 					id='field'
 					className={` ${
 						cut === 9
