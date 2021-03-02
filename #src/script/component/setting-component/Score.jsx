@@ -26,7 +26,7 @@ const Score = () => {
 				<div
 					className={`  z-30 absolute flex-col  flex justify-center items-center opacity-0 ${
 						active && 'opacity-100'
-					}  h-full w-full bg-red-400 top-0 left-0 transition-all duration-500`}>
+					}  h-full w-full bg-red-400 bg-opacity-70 top-0 left-0 transition-all duration-500`}>
 					<div className={`flex w-3/4 justify-around`}>
 						<button
 							onClick={() => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, lazy } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import storage from '@utils/storage.js';
 import popupImg from '@assets/images/popup.gif';
 import { Context } from '@utils/Context.jsx';
@@ -27,6 +27,29 @@ const EndGamePopup = ({
 	const [name, setname] = useState('');
 	const [soundWin, setsoundWin] = useState(new Audio(winSong));
 	const [soundLose, setsoundLose] = useState(new Audio(loseSong));
+
+	//---------------------------------------------
+	const handlerSabmit = async e => {
+		e.preventDefault();
+		let scoreArr = [];
+		if (storage.get('score')) {
+			scoreArr = storage.get('score');
+		}
+		scoreArr.push({
+			time: scoreInfo.time,
+			point: scoreInfo.point,
+			cut: cut === 9 ? 'beginner' : cut === 16 ? 'intermediate' : 'master',
+			victory: victory ? 'Win!' : 'Lose!',
+			name: name,
+		});
+		storage.set('score', scoreArr);
+		setopacity('opacity-0');
+		await pause(0.7);
+		setReset(true);
+		createField();
+		setopacity('opacity-100');
+	};
+	//-----------------------------------------------
 	useEffect(() => {
 		setscoreInfo({
 			time: time,
@@ -53,40 +76,14 @@ const EndGamePopup = ({
 			} top-0 left-0 opacity-0 transition duration-1000  `}>
 			{(gameOver || victory) && (
 				<form
-					onSubmit={async e => {
-						e.preventDefault();
-						let scoreArr = [];
-						if (storage.get('score')) {
-							scoreArr = storage.get('score');
-						}
-						scoreArr.push({
-							time: scoreInfo.time,
-							point: scoreInfo.point,
-							cut:
-								cut === 9
-									? 'beginner'
-									: cut === 16
-									? 'intermediate'
-									: 'master',
-							victory: victory ? 'Win!' : 'Lose!',
-							name: name,
-						});
-						storage.set('score', scoreArr);
-						setopacity('opacity-0');
-						await pause(0.7);
-						setReset(true);
-						createField();
-						setopacity('opacity-100');
-					}}
+					onSubmit={handlerSabmit.bind(this)}
 					className={`p-2 relative ${opacity} transition-all duration-700 h-full flex flex-col justify-center items-center space-y-4 w-full text-xl font-bold bg-blue-200 bg-opacity-70`}>
 					<label>
 						<p>Name:</p>
 						<input
 							type='text'
 							value={name}
-							onChange={e => {
-								setname(e.target.value);
-							}}
+							onChange={e => setname(e.target.value)}
 						/>
 					</label>
 					<label>
@@ -105,7 +102,7 @@ const EndGamePopup = ({
 					<button
 						className={`h-14 w-14 rounded-xl overflow-hidden `}
 						type='submit'>
-						<img src={popupImg} alt=' ' />
+						<img src={popupImg} alt='submit' />
 					</button>
 				</form>
 			)}

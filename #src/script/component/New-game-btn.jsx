@@ -17,9 +17,11 @@ const Btn = ({ setReset, createField }) => {
 		playbackRate,
 		volume: playbackRate,
 	});
+	//-------------------------------------------
 	useEffect(() => {
 		speakValue === 'новая игра' && setNewGame();
 	}, [speakValue]);
+	//-------------------------------------------
 	return (
 		<button
 			className={`bg-black transform px-4 py-2 btn space-x-2 rounded-xl font-bold text-xl flex items-center relative text-yellow-500

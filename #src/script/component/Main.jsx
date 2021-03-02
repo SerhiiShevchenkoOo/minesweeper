@@ -144,6 +144,7 @@ const Main = () => {
 	}, [updatePoint, update, victory]); // add locale storage
 	//------------------------------------------------------
 
+	// keyboard conrol-----------------------------------
 	const ref = useRef(null);
 	const [activeCellIndex, setactiveCellIndex] = useState(0);
 	useEffect(() => {
