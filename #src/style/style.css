@@ -22,5 +22,5 @@ label > p {
 }
 
 .score > span {
-	@apply pl-3 text-base overflow-hidden rounded-lg border border-green-700;
+	@apply pl-3 text-base overflow-hidden rounded-lg border bg-yellow-400 border-green-700;
 }
