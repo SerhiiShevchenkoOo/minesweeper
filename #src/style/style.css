@@ -8,19 +8,3 @@ body {
 	width: 100%;
 	font-size: 14px;
 }
-::-webkit-scrollbar {
-	display: none;
-}
-label {
-	@apply flex space-x-3 pl-3;
-}
-input {
-	@apply rounded-lg;
-}
-label > p {
-	@apply w-16;
-}
-
-.score > span {
-	@apply pl-3 text-base overflow-hidden rounded-lg border bg-yellow-400 border-green-700;
-}

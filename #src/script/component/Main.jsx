@@ -1,235 +1,202 @@
-import React, { useState, useEffect, useRef, lazy } from 'react';
-import arrowControl from '@utils/arrow-control.js';
+import React, { useState, useEffect } from 'react';
+import style from '@style/style.js';
 import shuffle from '@utils/shuffle.js';
 import storage from '@utils/storage.js';
-import cellObg from '@utils/cell-obg.js';
-import Cell from './Cell.jsx';
-import fieldSizes from '@utils/field-size.js';
-import Timer from './Timer.jsx';
-import Mine from './Mine.jsx';
-import playImage from '@assets/images/play.gif';
-import sadImage from '@assets/images/fail.gif';
-import victoryImage from '@assets/images/victory.gif';
-import Spinner from './Spinner.jsx';
-import Btn from './New-game-btn.jsx';
-import FieldSizeBtn from './Field-size-btn.jsx';
-import EndGamePopup from './EndGamePopup.jsx';
 
-const Main = () => {
-	const [loader, setLoader] = useState(true);
-	const [victory, setVictory] = useState(false);
-	const [point, setPoint] = useState(
-		storage.get('point') ? storage.get('point') : 0,
-	);
-	const [reset, setReset] = useState(false); // when click on button 'reset'
-	const [fieldSize, setFieldSize] = useState(
-		storage.get('continue')
-			? storage.get('continue').size
-			: fieldSizes.beginner.size,
-	); // set fieldSize
-	const [arr, setArr] = useState([]); //set start cellArr
-	const [c, setCheck] = useState(false); //set check arr for index cell
-	const [newGame, setNewGame] = useState(true); // set new game
-	const [time, setTime] = useState(0); //timer time
-	const [isActive, setIsActive] = useState(false);
-	const [mines, setMines] = useState(
-		storage.get('continue')
-			? storage.get('continue').mines
-			: fieldSizes.beginner.mine,
-	); //set mines
-	const [cut, setCut] = useState(
-		storage.get('continue')
-			? storage.get('continue').cut
-			: fieldSizes.beginner.cut,
-	); //custom columns
-	const [minesSensor, setMinesSensor] = useState(mines); // set mine index for the indicator of the number of mine
-	const [gameOver, setGameOver] = useState(false);
-	// function------------------------------------------
+const fieldSizes = {
+	beginner: {
+		size: 81,
+		mine: 10,
+	},
+	intermediate: {
+		size: 255,
+		mine: 40,
+	},
+	expert: {
+		size: 899,
+		mine: 99,
+	},
+};
 
-	const setMineSensor = (e, arr) => {
-		e === true
-			? setMinesSensor(minesSensor - 1)
-			: setMinesSensor(minesSensor + 1);
-	}; // set mineSensor
-
-	const updatePoint = () => {
-		setPoint(Math.round((arr.filter(e => e.open).length * cut) / 10));
-	}; // setNewPoint
-
-	const update = arr => {
-		setArr(arr);
-		setCheck(!c);
-	}; // update field when the cell opens ---------------
-
-	const createField = e => {
-		if (!storage.get('continue') || e) {
-			let arr = [];
-			for (let i = 0; i < fieldSize; i++) {
-				let mine = i < mines;
-				arr.push({ mine: mine, open: false, check: false });
+const Cell = ({ cell, index, arr, checkArr }) => {
+	useEffect(() => {
+		checkArr.map(i => {
+			if (arr[i].open) {
+				if (
+					((cell.top && index - 9 === i) ||
+						(cell.bottom && index + 9 === i) ||
+						(cell.left && index - 1 === i) ||
+						(cell.right && index + 1 === i) ||
+						(cell.right && cell.top && index + 1 - 9 === i) ||
+						(cell.right && cell.bottom && index + 1 + 9 === i) ||
+						(cell.left && cell.top && index - 1 - 9 === i) ||
+						(cell.left && cell.bottom && index - 1 + 9 === i)) &&
+					!cell.open &&
+					!cell.mine
+				) {
+					openCell(cell, index, arr);
+				}
 			}
-			shuffle(arr); // random arr
-			// add full cell{...}
-			arr = arr.map(
-				(cell, index, arr) =>
-					(cell = cellObg(
-						cell.mine,
-						index,
-						cell.open,
-						cell.check,
-						cut,
-						arr,
-					)),
-			); // add key for cell
-			setPoint(0);
-			setIsActive(!isActive);
-			setGameOver(false);
-			setVictory(false);
-			setMinesSensor(mines);
-			setTime(0);
-			setArr(arr);
-			setNewGame(!newGame);
+		});
+	}, [checkArr]);
+	const [open, setOpen] = useState(false);
+	const [check, setCheck] = useState(false);
+	const [bg, setBg] = useState('bg-red-600');
+	const [count, setCount] = useState(0);
+	//add cell key----------------
+	const coll = index % 9,
+		row = (index - coll) / 9,
+		top = row > 0,
+		bottom = row < 8,
+		left = coll > 0,
+		right = coll < 8;
+	cell.bg = 'bg-red-500';
+	(cell.top = row > 0),
+		(cell.bottom = row < 8),
+		(cell.left = coll > 0),
+		(cell.right = coll < 8);
+	cell.coll = coll;
+	cell.row = row;
+	cell.open = open;
+	cell.image = cell.mine && true;
+	cell.check = check;
+	cell.index = index;
+	cell.mineIndex = checkFieldPosition(
+		top,
+		bottom,
+		right,
+		left,
+		9,
+		arr,
+		index,
+		cell,
+	);
+	//-----------------------------
+
+	//pointerEvent
+	const openCell = (cell, index, arr) => {
+		setOpen(true);
+		if (cell.mine) {
+			setBg('bg-red-900');
 		} else {
-			setMinesSensor(storage.get('continue').minesSensor);
-			setCut(storage.get('continue').cut);
-			setGameOver(storage.get('continue').gameOver);
-			setArr(storage.get('continue').arr);
-			setPoint(storage.get('continue').point);
-			setTime(storage.get('time'));
+			if (cell.mineIndex === 0) {
+				setBg('bg-blue-900');
+
+				checkArr.push(index);
+
+				storage.set('check', [...new Set(checkArr)]);
+			}
 		}
-	}; // create New game field
+	};
+	// check other cell------------------------
 
-	const setSettingSize = (size, mine, e) => {
-		storage.del('continue');
-		if (e === cut) return;
-		else {
-			setLoader(true);
-			setArr([]);
-			setCut(e);
-			setMines(mine);
-			setFieldSize(size);
-			setIsActive(!isActive);
+	//------------------------------------
+	return (
+		<button
+			onPointerDown={() => openCell(cell, index, arr)}
+			className={`h-8 w-8 ${bg} transition duration-500 `}>
+			{!cell.open
+				? ''
+				: !cell.mine
+				? cell.mineIndex > 0
+					? cell.mineIndex
+					: ''
+				: cell.image}
+		</button>
+	);
+};
+
+const Main = props => {
+	useEffect(() => {
+		const timer = setInterval(() => {
+			console.log(storage.get('check'));
+			setCheckArr(storage.get('check'));
+		}, 1000);
+	}, [checkArr]);
+	const [fieldSize, setFieldSize] = useState(fieldSizes.beginner.size);
+	const [checkArr, setCheckArr] = useState([]);
+	const [arr, setArr] = useState([]);
+	const [game, setGame] = useState(false);
+	const createField = () => {
+		storage.set('check', []);
+		let arr = [];
+		for (let i = 0; i < fieldSize; i++) {
+			let mine = i < 10;
+			arr.push({
+				mine: mine,
+			});
 		}
-	}; //set new size
-
-	//------------effects -------------------------------
-	useEffect(() => {
-		if (
-			minesSensor === 0 &&
-			arr.filter(e => e.check && e.mine).length === mines
-		) {
-			setVictory(true);
-			storage.del('continue');
-		}
-	}, [minesSensor]); // chech end game
-	useEffect(() => {
-		setCut(cut);
-		createField();
-		return setLoader(false);
-	}, [cut, mines]); // update field when size change
-	useEffect(() => {
-		storage.set('continue', {
-			arr: arr,
-			cut: cut,
-			minesSensor: minesSensor,
-			mines: mines,
-			gameOver: gameOver,
-			point: point,
-			size: fieldSize,
-		});
-		storage.set('time', time);
-
-		gameOver && storage.del('continue');
-		victory && storage.del('continue');
-	}, [updatePoint, update, victory]); // add locale storage
-	//------------------------------------------------------
-
-	// keyboard conrol-----------------------------------
-	const ref = useRef(null);
-	const [activeCellIndex, setactiveCellIndex] = useState(0);
-	useEffect(() => {
-		window.addEventListener('keydown', e => {
-			e.code == 'Space' &&
-				(setactiveCellIndex(0), ref.current.children[0].focus());
-		});
-	}, []);
+		shuffle(arr);
+		setArr(arr);
+		setGame(true);
+	};
 
 	return (
-		<div
-			onKeyDown={e =>
-				arrowControl(e, cut, setactiveCellIndex, activeCellIndex)
-			}
-			onContextMenu={e => e.preventDefault()}
-			className='h-full w-screen flex flex-col justify-between items-center'>
-			{/* newGameButton----------------------------------------------------------------------------- */}
-			<div className='flex flex-wrap  items-center w-4/5 md:w-3/4 justify-between'>
-				<Btn createField={createField} setReset={setReset} />
-				{/* gameImage----------------------------------------------------------------------------- */}
-				<img
-					className={'h-20 w-20 '}
-					src={gameOver ? sadImage : victory ? victoryImage : playImage}
-					alt={'viiiu'}
-				/>
-				{/* mineSensor----------------------------------------------------------------------------- */}
-				<Mine mine={minesSensor} />
-				{/* timer----------------------------------------------------------------------------- */}
-				<Timer time={time} isActive={isActive} setTime={setTime} />
-				{/* point----------------------------------------------------------------------------- */}
-				<div className='bg-black px-2 py-1  rounded-xl font-medium text-xl  text-yellow-500 justify-center flex items-center'>
-					<p>Points:{point}</p>
-				</div>
-			</div>
-			{/* field----------------------------------------------------------------------------- */}
-			{loader ? (
-				<Spinner />
-			) : (
-				<div
-					ref={ref}
-					id='field'
-					className={` ${
-						cut === 9
-							? 'grid-cols-9t md:grid-cols-9 md:auto-rows-1 '
-							: cut === 16
-							? 'grid-cols-16t md:grid-cols-16 md:auto-rows-1'
-							: 'grid-cols-30t md:grid-cols-30 md:auto-rows-2'
-					} gap-1 grid max-w-full overflow-auto  max-h-full m-h-3/4	relative  auto-rows-t`}>
+		<div>
+			<button
+				className={'h-10 w-10 bg-yellow-600'}
+				onPointerDown={() => createField()}></button>
+			{game ? (
+				<div className=' grid-cols-9 gap-1 grid trans'>
 					{arr.map((cell, index, arr) => {
 						return (
-							<React.Fragment key={index}>
+							<div key={index}>
 								<Cell
 									cell={cell}
 									index={index}
-									update={update}
 									arr={arr}
-									newGame={newGame}
-									setMineSensor={setMineSensor}
-									setGameOver={setGameOver}
-									cut={cut}
-									updatePoint={updatePoint}
-									reset={reset}
-									setactiveCellIndex={setactiveCellIndex}
+									checkArr={checkArr}
 								/>
-							</React.Fragment>
+							</div>
 						);
 					})}
-					<EndGamePopup
-						victory={victory}
-						gameOver={gameOver}
-						time={time}
-						point={point}
-						cut={cut}
-						createField={createField}
-						setReset={setReset}
-					/>
+				</div>
+			) : (
+				<div>
+					gddddddddddddddddddddddddddddddd chchchchc chcjjcjc chcjjcjcccjcj
+					-- cjcjcjcjccc cccjcjcj -
 				</div>
 			)}
-			{/* fieldSize setting----------------------------------------------------------------------------- */}
-			<FieldSizeBtn
-				fieldSizes={fieldSizes}
-				setSettingSize={setSettingSize}
-			/>
 		</div>
 	);
 };
+
+function checkFieldPosition(
+	top = false,
+	bottom = false,
+	right = false,
+	left = false,
+	cut = 9,
+	arr,
+	index,
+	cell,
+) {
+	let count = 0;
+	if (top) {
+		arr[index - 9].mine && count++;
+	}
+	if (bottom) {
+		arr[index + 9].mine && count++;
+	}
+	if (right) {
+		arr[index + 1].mine && count++;
+	}
+	if (left) {
+		arr[index - 1].mine && count++;
+	}
+	if (top && right) {
+		arr[index - 9 + 1].mine && count++;
+	}
+	if (top && left) {
+		arr[index - 9 - 1].mine && count++;
+	}
+	if (bottom && right) {
+		arr[index + 9 + 1].mine && count++;
+	}
+	if (bottom && left) {
+		arr[index + 9 - 1].mine && count++;
+	}
+	return count;
+}
 
 export default Main;
