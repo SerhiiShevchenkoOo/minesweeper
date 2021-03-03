@@ -1,2 +1,20 @@
-node_modules
-*.gitignore
+# Отладочные журналы npm
+*.log
+# Зависимости проекта
+/node_modules/
+# Атрибуты папки OSX
+.DS_Store
+# Временные файлы
+*.tmp
+#  сборкa
+/dist/
+# git
+/.git
+#vs
+/.vscode/
+
+# txt
+/*.txt
+# ! - кроме
+
+
