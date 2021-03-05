@@ -38,3 +38,4 @@
 > and other...
 
 ## Exemple: [react-game](https://serhiishevchenkooo-react-game.netlify.app/)
+### присутствует скролл, но он скрыт, по факту передвижение будет работать с зажатой средней кнопкой мыши или с помощью стрелок)
